@@ -83,6 +83,9 @@
         }
 
 
+
+
+
         .snap {
             height: 100%;
             display: flex;
@@ -763,6 +766,86 @@
             max-width: 800px;
             width: 100%;
             margin: 0 auto
+        }
+
+        /* ---- avatar-accent background theme ---- */
+        :root {
+            --a1: 120, 120, 140;
+            --a2: 90, 90, 110;
+            --a3: 140, 110, 130
+        }
+
+        .abg {
+            position: fixed;
+            inset: 0;
+            z-index: -3;
+            overflow: hidden;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 1.8s ease
+        }
+
+        .abg.on {
+            opacity: 1
+        }
+
+        .abg b {
+            position: absolute;
+            width: 72vmax;
+            height: 72vmax;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: .34;
+            will-change: transform;
+            transition: background 1.4s ease
+        }
+
+        .abg b:nth-child(1) {
+            left: -22vmax;
+            top: -28vmax;
+            background: radial-gradient(circle, rgb(var(--a1)), transparent 66%);
+            animation: abd1 32s ease-in-out infinite alternate
+        }
+
+        .abg b:nth-child(2) {
+            right: -26vmax;
+            top: 6vmax;
+            background: radial-gradient(circle, rgb(var(--a2)), transparent 66%);
+            animation: abd2 38s ease-in-out infinite alternate
+        }
+
+        .abg b:nth-child(3) {
+            left: 8vmax;
+            bottom: -38vmax;
+            background: radial-gradient(circle, rgb(var(--a3)), transparent 66%);
+            animation: abd3 44s ease-in-out infinite alternate
+        }
+
+        @keyframes abd1 {
+            to {
+                transform: translate(14vmax, 10vmax) scale(1.12)
+            }
+        }
+
+        @keyframes abd2 {
+            to {
+                transform: translate(-12vmax, 14vmax) scale(1.08)
+            }
+        }
+
+        @keyframes abd3 {
+            to {
+                transform: translate(10vmax, -12vmax) scale(1.15)
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .abg,
+            .abg b {
+                transition: none;
+                animation: none !important
+            }
         }
 
         .pbg {
@@ -1533,6 +1616,7 @@
 </head>
 
 <body>
+    <div class="abg" id="abg"><b></b><b></b><b></b></div>
     <div class="pbg" id="pbg"><i></i><i></i></div>
     <div id="enter" class="enter-overlay" aria-label="Click to enter">
         <div class="enter-text">
@@ -1560,7 +1644,7 @@
                 </div>
                 <div class="bio">i'm a <b>web developer</b> building things with <b>html, css, js</b> and <b>python</b>.
                     i like keeping things clean, fast and simple. find me on <a href="#" data-copy="1">discord</a> or <a
-                        href="https://t.me/iberty" target="_blank" rel="noopener">telegram</a>.</div>
+                        href="https://t.me/sad949345" target="_blank" rel="noopener">telegram</a>.</div>
                 <nav class="links">
                     <div class="lr"><a href="#" id="dc" aria-label="Copy Discord username"><svg viewBox="0 0 24 24"
                                 fill="currentColor">
@@ -1993,12 +2077,51 @@
                 })
             }).catch(function () { })
         })();
+        function avTheme(h) {
+            if (avTheme.h === h) return; avTheme.h = h;
+            var bg = document.getElementById('abg'), root = document.documentElement.style;
+            function put(c) { for (var i = 0; i < 3; i++) { var k = c[i] || c[0]; root.setProperty('--a' + (i + 1), k[0] + ',' + k[1] + ',' + k[2]) } if (bg) bg.classList.add('on') }
+            function vivid(r, g, b) {
+                r /= 255; g /= 255; b /= 255;
+                var mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn, s = 0, hh = 0;
+                if (d) { s = d / (1 - Math.abs(2 * l - 1)); hh = mx === r ? ((g - b) / d + 6) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4 }
+                s = Math.max(s, .55); l = Math.min(Math.max(l, .45), .62);
+                var C = (1 - Math.abs(2 * l - 1)) * s, X = C * (1 - Math.abs(hh % 2 - 1)), m = l - C / 2, o = [[C, X, 0], [X, C, 0], [0, C, X], [0, X, C], [X, 0, C], [C, 0, X]][Math.floor(hh) % 6];
+                return [Math.round((o[0] + m) * 255), Math.round((o[1] + m) * 255), Math.round((o[2] + m) * 255)]
+            }
+            try { var ca = JSON.parse(localStorage.getItem('avth') || 'null'); if (ca && ca.h === h && ca.c && ca.c.length) put(ca.c) } catch (x) { }
+            var im = new Image(); im.crossOrigin = 'anonymous';
+            im.onload = function () {
+                try {
+                    var S = 48, cv = document.createElement('canvas'); cv.width = cv.height = S;
+                    var cx = cv.getContext('2d', { willReadFrequently: true }); cx.drawImage(im, 0, 0, S, S);
+                    var d = cx.getImageData(0, 0, S, S).data, B = {}, i;
+                    for (i = 0; i < d.length; i += 4) {
+                        if (d[i + 3] < 200) continue;
+                        var r = d[i], g = d[i + 1], b = d[i + 2], mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 510;
+                        if (l < .1 || l > .93) continue;
+                        var s = mx === mn ? 0 : (mx - mn) / (255 - Math.abs(mx + mn - 255)), w = .08 + s * s * (1 - Math.abs(l - .5) * 1.4),
+                            k = (r >> 5) + '-' + (g >> 5) + '-' + (b >> 5), e = B[k] || (B[k] = { w: 0, r: 0, g: 0, b: 0 });
+                        e.w += w; e.r += r * w; e.g += g * w; e.b += b * w
+                    }
+                    var A = Object.keys(B).map(function (k) { var e = B[k]; return [e.r / e.w, e.g / e.w, e.b / e.w, e.w] }).sort(function (a, b) { return b[3] - a[3] }), P = [];
+                    A.forEach(function (c) {
+                        if (P.length >= 3) return;
+                        if (P.every(function (q) { return Math.abs(q[0] - c[0]) + Math.abs(q[1] - c[1]) + Math.abs(q[2] - c[2]) > 110 })) P.push(c)
+                    });
+                    if (!P.length) return;
+                    var out = P.map(function (c) { return vivid(c[0], c[1], c[2]) });
+                    put(out); try { localStorage.setItem('avth', JSON.stringify({ h: h, c: out })) } catch (x) { }
+                } catch (x) { }
+            };
+            im.src = 'https://cdn.discordapp.com/avatars/' + UID + '/' + h + '.png?size=128'
+        }
         function lan(d) {
             try {
                 var u = d.discord_user || {}, e = $('ds'), st = d.discord_status || 'offline', as = d.activities || [], txt = 'currently doing nothing',
                     c = as.filter(function (a) { return a.type === 4 })[0], o = as.filter(function (a) { return a.type !== 4 })[0];
                 var nm = u.display_name || u.global_name || u.username || '9ineskulls'; $('pn').textContent = nm; if (u.display_name || u.global_name || u.username) { if ($('wn')) $('wn').textContent = nm; $('hn').textContent = nm; setTitle(nm); } LPG = u.primary_guild || null; renderTag(LPG || DPG);
-                if (u.avatar) $('av').src = 'https://cdn.discordapp.com/avatars/' + UID + '/' + u.avatar + '.png?size=128'; if (u.avatar) document.getElementById('hp').src = 'https://cdn.discordapp.com/avatars/' + UID + '/' + u.avatar + '.png?size=64';
+                if (u.avatar) $('av').src = 'https://cdn.discordapp.com/avatars/' + UID + '/' + u.avatar + '.png?size=128'; if (u.avatar) document.getElementById('hp').src = 'https://cdn.discordapp.com/avatars/' + UID + '/' + u.avatar + '.png?size=64'; if (u.avatar) avTheme(u.avatar);
                 if (u.username) { DUN = u.username; $('un').textContent = '@' + u.username; document.getElementById('hun').textContent = '@' + u.username } e.dataset.s = st; e.style.background = COL[st] || COL.offline;
                 if (c && (c.state || c.emoji)) txt = (((c.emoji && c.emoji.name && !c.emoji.id) ? c.emoji.name + ' ' : '') + (c.state || '')).trim() || txt;
                 else if (d.listening_to_spotify && d.spotify) txt = 'Listening to ' + d.spotify.song + ' by ' + d.spotify.artist;
